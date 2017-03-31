@@ -10,6 +10,7 @@
 #include "ScreenController.h"
 #include "WiFiController.h"
 #include "TimeController.h"
+#include "WebController.h"
 
 // const char* ssid = "";
 // const char* password = "";
@@ -36,6 +37,7 @@ void setup() {
 }
 
 void loop() {
-  timeController.update();
   screenController.update();
+  timeController.update();
+  screenController.updateClock();
 }

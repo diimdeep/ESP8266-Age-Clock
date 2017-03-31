@@ -69,52 +69,51 @@ void clockOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
 
 }
 
-void analogClockFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
-//  ui.disableIndicator();
+#include <Chronos.h>
+#include <Time.h>
+#include <avr_f64.h>
 
-  // Draw the clock face
-//  display->drawCircle(clockCenterX + x, clockCenterY + y, clockRadius);
-  display->drawCircle(clockCenterX + x, clockCenterY + y, 2);
-  //
-  //hour ticks
-  for( int z=0; z < 360;z= z + 30 ){
-  //Begin at 0° and stop at 360°
-    float angle = z ;
-    angle = ( angle / 57.29577951 ) ; //Convert degrees to radians
-    int x2 = ( clockCenterX + ( sin(angle) * clockRadius ) );
-    int y2 = ( clockCenterY - ( cos(angle) * clockRadius ) );
-    int x3 = ( clockCenterX + ( sin(angle) * ( clockRadius - ( clockRadius / 8 ) ) ) );
-    int y3 = ( clockCenterY - ( cos(angle) * ( clockRadius - ( clockRadius / 8 ) ) ) );
-    display->drawLine( x2 + x , y2 + y , x3 + x , y3 + y);
+int update_per_ms = 70;
+
+Chronos::DateTime dob = Chronos::DateTime(1989, 9, 11, 10, 0, 0);
+float seconds_in_year = 31556900;
+
+uint32_t last_age_in_seconds = 0;
+float64_t last_age = 0;
+float64_t sec_in_year = f_long_to_float64(31556900);
+float64_t diff_per_second = f_div(f_long_to_float64(1), f_long_to_float64(31556900));
+float32_t fps_for_ms = 1000.0/update_per_ms;
+float64_t diff_per_update_at_rate = f_div(diff_per_second, f_sd(fps_for_ms));
+
+uint32_t last_update = 0;
+
+void ScreenController::updateClock() {
+  if (millis() < last_update + update_per_ms)
+    return;
+
+  Chronos::Span::Delta age = Chronos::DateTime::now() - dob;
+  const Chronos::EpochTime age_in_seconds = age.totalSeconds();
+
+  if (last_age_in_seconds == age_in_seconds) {
+    last_age = f_add(last_age, diff_per_update_at_rate);
+    last_update = millis();
   }
-
-  // display second hand
-  float angle = second() * 6 ;
-  angle = ( angle / 57.29577951 ) ; //Convert degrees to radians
-  int x3 = ( clockCenterX + ( sin(angle) * ( clockRadius - ( clockRadius / 5 ) ) ) );
-  int y3 = ( clockCenterY - ( cos(angle) * ( clockRadius - ( clockRadius / 5 ) ) ) );
-  display->drawLine( clockCenterX + x , clockCenterY + y , x3 + x , y3 + y);
-  //
-  // display minute hand
-  angle = minute() * 6 ;
-  angle = ( angle / 57.29577951 ) ; //Convert degrees to radians
-  x3 = ( clockCenterX + ( sin(angle) * ( clockRadius - ( clockRadius / 4 ) ) ) );
-  y3 = ( clockCenterY - ( cos(angle) * ( clockRadius - ( clockRadius / 4 ) ) ) );
-  display->drawLine( clockCenterX + x , clockCenterY + y , x3 + x , y3 + y);
-  //
-  // display hour hand
-  angle = hour() * 30 + int( ( minute() / 12 ) * 6 )   ;
-  angle = ( angle / 57.29577951 ) ; //Convert degrees to radians
-  x3 = ( clockCenterX + ( sin(angle) * ( clockRadius - ( clockRadius / 2 ) ) ) );
-  y3 = ( clockCenterY - ( cos(angle) * ( clockRadius - ( clockRadius / 2 ) ) ) );
-  display->drawLine( clockCenterX + x , clockCenterY + y , x3 + x , y3 + y);
+  else {
+    last_age_in_seconds = age_in_seconds;
+    float64_t sec_dur3 = f_long_to_float64(age_in_seconds);
+    last_age = f_div(sec_dur3, sec_in_year);
+    last_update = millis();
+  }
 }
 
+int remainingTimeBudget = 0;
+
 void digitalClockFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
-  String timenow = String(hour())+":"+twoDigits(minute())+":"+twoDigits(second());
-  display->setTextAlignment(TEXT_ALIGN_CENTER);
-  display->setFont(ArialMT_Plain_24);
-  display->drawString(clockCenterX + x , clockCenterY + y, timenow );
+  String timenow = f_to_string(last_age, 13,10);
+  display->setTextAlignment(TEXT_ALIGN_LEFT);
+  display->setFont(ArialMT_Plain_16);
+  display->drawString(0 + x , 11 + y, timenow);
+  display->drawString(0 + x , 40 + y, String(remainingTimeBudget));
 }
 
 // This array keeps function pointers to all frames
@@ -130,14 +129,14 @@ int overlaysCount = 1;
 
 
 ScreenController::ScreenController(){
-  
+
 }
 
 void ScreenController::setup() {
   // The ESP is capable of rendering 60fps in 80Mhz mode
   // but that won't give you much time for anything else
   // run it in 160Mhz mode or just set it to 30 fps
-  ui.setTargetFPS(60);
+  //ui.setTargetFPS(23);
 
   // Add frames
   ui.setFrames(frames, frameCount);
@@ -154,15 +153,16 @@ void ScreenController::setup() {
 
 }
 
+
+
 void ScreenController::update() {
-  int remainingTimeBudget = ui.update();
+  remainingTimeBudget = ui.update();
 
   if (remainingTimeBudget > 0) {
     // You can do some work here
     // Don't do stuff if you are below your
     // time budget.
-    delay(remainingTimeBudget);
-
+    //delay(remainingTimeBudget);
   }
 
 }

@@ -4,4 +4,5 @@ class ScreenController
     ScreenController();
     void setup();
     void update();
+    void updateClock();
 };
