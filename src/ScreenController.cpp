@@ -71,19 +71,19 @@ void clockOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
 
 #include <Chronos.h>
 #include <Time.h>
-#include <avr_f64.h>
+#include <Float64.h>
 
-int update_per_ms = 70;
+uint32_t update_per_ms = 70;
 
 Chronos::DateTime dob = Chronos::DateTime(1989, 9, 11, 10, 0, 0);
-float seconds_in_year = 31556900;
+uint32_t seconds_in_year = 31556900;
 
 uint32_t last_age_in_seconds = 0;
-float64_t last_age = 0;
-float64_t sec_in_year = f_long_to_float64(seconds_in_year);
-float64_t diff_per_second = f_div(f_long_to_float64(1), f_long_to_float64(seconds_in_year));
-float32_t fps_for_ms = 1000.0/update_per_ms;
-float64_t diff_per_update_at_rate = f_div(diff_per_second, f_sd(fps_for_ms));
+f64 last_age = 0;
+f64 sec_in_year = seconds_in_year;
+f64 diff_per_second = f64(1)/sec_in_year;
+f64 fps_for_ms = f64(1000)/f64(update_per_ms);
+f64 diff_per_update_at_rate = diff_per_second/fps_for_ms;
 
 uint32_t last_update = 0;
 
@@ -95,13 +95,13 @@ void ScreenController::updateClock() {
   const Chronos::EpochTime age_in_seconds = age.totalSeconds();
 
   if (last_age_in_seconds == age_in_seconds) {
-    last_age = f_add(last_age, diff_per_update_at_rate);
+    last_age = last_age + diff_per_update_at_rate;
     last_update = millis();
   }
   else {
     last_age_in_seconds = age_in_seconds;
-    float64_t sec_dur3 = f_long_to_float64(age_in_seconds);
-    last_age = f_div(sec_dur3, sec_in_year);
+    f64 sec_dur3 = f64(age_in_seconds);
+    last_age = sec_dur3/sec_in_year;
     last_update = millis();
   }
 }
@@ -109,7 +109,8 @@ void ScreenController::updateClock() {
 int remainingTimeBudget = 0;
 
 void digitalClockFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
-  String timenow = f_to_string(last_age, 13,10);
+  //String timenow = f_to_string(last_age, 13,10);
+  String timenow = last_age.toString(9);
   display->setTextAlignment(TEXT_ALIGN_LEFT);
   display->setFont(ArialMT_Plain_16);
   display->drawString(0 + x , 11 + y, timenow);
