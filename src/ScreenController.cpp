@@ -80,8 +80,8 @@ float seconds_in_year = 31556900;
 
 uint32_t last_age_in_seconds = 0;
 float64_t last_age = 0;
-float64_t sec_in_year = f_long_to_float64(31556900);
-float64_t diff_per_second = f_div(f_long_to_float64(1), f_long_to_float64(31556900));
+float64_t sec_in_year = f_long_to_float64(seconds_in_year);
+float64_t diff_per_second = f_div(f_long_to_float64(1), f_long_to_float64(seconds_in_year));
 float32_t fps_for_ms = 1000.0/update_per_ms;
 float64_t diff_per_update_at_rate = f_div(diff_per_second, f_sd(fps_for_ms));
 
