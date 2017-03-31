@@ -21,15 +21,13 @@ void WiFiController::setupClient(const char* ssid, const char* password) {
   WiFi.hostname(_hostname);
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    // TODO make async ?
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.printf("Connected.\n");
-  Serial.print("http://");
-  Serial.print(WiFi.localIP());
-  Serial.print("  http://");
-  Serial.print( _hostname);
+  _onGotIP = WiFi.onStationModeGotIP([&](const WiFiEventStationModeGotIP &ipInfo)
+    {
+      Serial.printf("Connected.\n");
+      Serial.print("http://");
+      Serial.print(WiFi.localIP());
+      Serial.print("  http://");
+      Serial.print(_hostname);
+      Serial.println();
+    });
 }

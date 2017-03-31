@@ -1,4 +1,4 @@
-#include "Screen.h"
+#include "ScreenController.h"
 
 #include <TimeLib.h>
 
@@ -129,8 +129,11 @@ OverlayCallback overlays[] = { clockOverlay };
 int overlaysCount = 1;
 
 
+ScreenController::ScreenController(){
+  
+}
 
-void setupScreen() {
+void ScreenController::setup() {
   // The ESP is capable of rendering 60fps in 80Mhz mode
   // but that won't give you much time for anything else
   // run it in 160Mhz mode or just set it to 30 fps
@@ -151,7 +154,7 @@ void setupScreen() {
 
 }
 
-void updateScreen() {
+void ScreenController::update() {
   int remainingTimeBudget = ui.update();
 
   if (remainingTimeBudget > 0) {

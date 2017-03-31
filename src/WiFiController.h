@@ -9,4 +9,5 @@ class WiFiController
 
   private:
     String _hostname;
+    WiFiEventHandler _onGotIP;
 };

@@ -7,8 +7,9 @@
 #include <ESPAsyncWiFiManager.h>         //https://github.com/tzapu/WiFiManager
 #include <Hash.h>
 
-#include "Screen.h"
+#include "ScreenController.h"
 #include "WiFiController.h"
+#include "TimeController.h"
 
 // const char* ssid = "";
 // const char* password = "";
@@ -21,6 +22,8 @@ const bool useDHCP = true;
 #define TRIGGER_PIN 3
 
 WiFiController wifiController(hostname);
+TimeController timeController;
+ScreenController screenController;
 
 void setup() {
   Serial.begin(115200);
@@ -28,17 +31,11 @@ void setup() {
 
   pinMode(TRIGGER_PIN, INPUT);
 
-  unsigned long secsSinceStart = millis();
-  // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-  const unsigned long seventyYears = 2208988800UL;
-  // subtract seventy years:
-  unsigned long epoch = secsSinceStart - seventyYears * SECS_PER_HOUR;
-  setTime(epoch);
-  setupScreen();
-
+  screenController.setup();
   wifiController.setupClient(ssid, password);
 }
 
 void loop() {
-  updateScreen();
+  timeController.update();
+  screenController.update();
 }
