@@ -8,15 +8,19 @@
 #include <Hash.h>
 
 #include "Screen.h"
+#include "WiFiController.h"
+
+// const char* ssid = "";
+// const char* password = "";
+#include "Secret.h"
 
 const String hostname = "AgeClock";
 
+const bool useDHCP = true;
 
 #define TRIGGER_PIN 3
 
-AsyncWebServer server(80);
-DNSServer dns;
-AsyncWiFiManager wifiManager(&server,&dns);
+WiFiController wifiController(hostname);
 
 void setup() {
   Serial.begin(115200);
@@ -32,11 +36,9 @@ void setup() {
   setTime(epoch);
   setupScreen();
 
-  wifiManager.startConfigPortalModeless("OnDemandAP", NULL);
+  wifiController.setupClient(ssid, password);
 }
 
 void loop() {
   updateScreen();
-
-  wifiManager.loop();
 }
