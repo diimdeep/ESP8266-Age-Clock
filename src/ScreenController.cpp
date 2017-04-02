@@ -108,13 +108,20 @@ void ScreenController::updateClock() {
 
 int remainingTimeBudget = 0;
 
+#include "fonts.h"
+
 void digitalClockFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
   //String timenow = f_to_string(last_age, 13,10);
   String timenow = last_age.toString(9);
+  String fixed = timenow.substring(0, 2);
+  String mantiss = timenow.substring(2, timenow.length());
+
+
   display->setTextAlignment(TEXT_ALIGN_LEFT);
-  display->setFont(ArialMT_Plain_16);
-  display->drawString(0 + x , 11 + y, timenow);
-  display->drawString(0 + x , 40 + y, String(remainingTimeBudget));
+  display->setFont(Roboto_Condensed_20);
+  display->drawString(0 + x , 11 + y, fixed);
+  display->setFont(Roboto_Condensed_16);
+  display->drawString(22 + x , 13 + y, String(mantiss));
 }
 
 // This array keeps function pointers to all frames
