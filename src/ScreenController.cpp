@@ -47,30 +47,11 @@ SH1106  display(0x3c, D1, D2);
 
 OLEDDisplayUi ui ( &display );
 
-int screenW = 128;
-int screenH = 64;
-int clockCenterX = screenW/2;
-int clockCenterY = ((screenH-16)/2)+16;   // top yellow part is 16 px height
-int clockRadius = 23;
-
-
-// utility function for digital clock display: prints leading 0
-String twoDigits(int digits){
-  if(digits < 10) {
-    String i = '0'+String(digits);
-    return i;
-  }
-  else {
-    return String(digits);
-  }
-}
-
 void clockOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
 
 }
 
 #include <Chronos.h>
-#include <Time.h>
 #include <Float64.h>
 
 uint32_t update_per_ms = 70;
@@ -111,11 +92,9 @@ int remainingTimeBudget = 0;
 #include "fonts.h"
 
 void digitalClockFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
-  //String timenow = f_to_string(last_age, 13,10);
   String timenow = last_age.toString(9);
   String fixed = timenow.substring(0, 2);
   String mantiss = timenow.substring(2, timenow.length());
-
 
   display->setTextAlignment(TEXT_ALIGN_LEFT);
   display->setFont(Roboto_Condensed_20);
