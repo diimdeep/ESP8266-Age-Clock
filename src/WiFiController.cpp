@@ -17,6 +17,8 @@ String WiFiController::formatHostname(const String hostname) {
 }
 
 void WiFiController::setupClient(const char* ssid, const char* password) {
+  WiFi.printDiag(Serial);
+  
   Serial.printf("Connecting to %s\n", ssid);
   WiFi.hostname(_hostname);
   WiFi.begin(ssid, password);
@@ -28,6 +30,7 @@ void WiFiController::setupClient(const char* ssid, const char* password) {
       Serial.print(WiFi.localIP());
       Serial.print("  http://");
       Serial.print(_hostname);
+      Serial.println();
       Serial.println();
     });
 }
