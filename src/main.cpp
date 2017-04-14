@@ -1,9 +1,11 @@
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
+#include <Time.h>
 #include <TimeLib.h>
 #include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
 #include <Hash.h>
 
+#include "pinout.h"
 #include "ScreenController.h"
 #include "WiFiController.h"
 #include "TimeController.h"
@@ -39,6 +41,8 @@ void setup() {
     }
     Serial.printf("\n");
   }
+
+  pinMode(D3, INPUT_PULLUP);
 }
 
 void loop() {

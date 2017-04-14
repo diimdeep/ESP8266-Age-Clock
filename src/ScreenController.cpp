@@ -22,6 +22,8 @@
 // Include custom images
 #include "images.h"
 
+#include "pinout.h"
+
 // Use the corresponding display class:
 
 // Initialize the OLED display using SPI
@@ -47,8 +49,15 @@ SH1106  display(0x3c, D1, D2);
 
 OLEDDisplayUi ui ( &display );
 
-void clockOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
+int D3_state = 0;
 
+int width = 128;
+int height = 64;
+
+void clockOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
+  if (D3_state) {
+    display->drawXbm(2, 2, wifi_02_width, wifi_02_height, wifi_02_bits);
+  }
 }
 
 #include <Chronos.h>
@@ -85,22 +94,30 @@ void ScreenController::updateClock() {
     last_age = sec_dur3/sec_in_year;
     last_update = millis();
   }
+
+  D3_state = digitalRead(D3);
 }
 
 int remainingTimeBudget = 0;
 
 #include "fonts.h"
 
+// SH1106 based 128x64 pixel OLED display
+
 void digitalClockFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
   String timenow = last_age.toString(9);
   String fixed = timenow.substring(0, 2);
   String mantiss = timenow.substring(2, timenow.length());
 
+  //display->drawRect(0, 0, width, height);
+
   display->setTextAlignment(TEXT_ALIGN_LEFT);
-  display->setFont(Roboto_Condensed_20);
-  display->drawString(0 + x , 11 + y, fixed);
   display->setFont(Roboto_Condensed_16);
-  display->drawString(22 + x , 13 + y, String(mantiss));
+  display->drawString(0 + x , 21 + y, "AGE");
+  display->setFont(Roboto_Condensed_26);
+  display->drawString(0 + x , 38 + y, fixed);
+  display->setFont(Roboto_Condensed_22);
+  display->drawString(23 + x , 42 + y, String(mantiss));
 }
 
 // This array keeps function pointers to all frames
@@ -136,6 +153,7 @@ void ScreenController::setup() {
 
   ui.disableAutoTransition();
   ui.disableIndicator();
+  ui.disableAllIndicators();
   //display.flipScreenVertically();
 
 }
