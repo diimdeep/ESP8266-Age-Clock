@@ -1,0 +1,4 @@
+class ConfigController {
+  public:
+    ConfigController();
+};

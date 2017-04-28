@@ -10,6 +10,7 @@
 #include "WiFiController.h"
 #include "TimeController.h"
 #include "WebController.h"
+#include "ConfigController.h"
 
 // const char* ssid = "";
 // const char* password = "";
@@ -21,6 +22,7 @@ WiFiController wifiController(hostname);
 TimeController timeController;
 ScreenController screenController;
 WebController webController;
+ConfigController configController;
 
 void setup() {
   Serial.begin(115200);
